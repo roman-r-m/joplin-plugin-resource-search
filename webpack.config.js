@@ -125,6 +125,10 @@ const baseConfig = {
 				use: 'ts-loader',
 				exclude: /node_modules/,
 			},
+			{
+				test: /\.node$/,
+				loader: 'node-loader',
+				},
 		],
 	},
 };
@@ -177,6 +181,10 @@ const createArchiveConfig = {
 	output: {
 		filename: 'index.js',
 		path: publishDir,
+	},
+	node: {
+		fs: "empty",
+		canvas: "empty"
 	},
 	plugins: [new WebpackOnBuildPlugin(onBuildCompleted)],
 };
