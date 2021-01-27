@@ -77,24 +77,27 @@ async function initDb(path: string) {
 	console.log('imported module: ' + typeof sqlite3);
 	const db = new sqlite3.Database(`${path}/resource.sqlite`);
 	console.log('created db: ' + typeof db);
-	await db.run('DROP TABLE resources_fts');
 	await db.run('CREATE VIRTUAL TABLE IF NOT EXISTS resources_fts USING fts5(id, title, text)');
 	return db;
 }
 
 async function indexResources(api: JoplinData, resourceDir: string, db: any) {
-	const resources: any[] = (await api.get(['resources'], { fields: ['id', 'title', 'mime']})).items;
-	resources.forEach(r => indexResource(r, resourceDir, db));
+	let page = 0;
+	let response = await api.get(['resources'], { page: page, fields: ['id', 'title', 'mime']});
+	console.log(`response: ${JSON.stringify(response)}`);
+	response.items.forEach(r => indexResource(r, resourceDir, db));
+	while (!!response.has_more) {
+		page += 1;
+		response = await api.get(['resources'], { page: page, fields: ['id', 'title', 'mime']});
+		console.log(`response: ${JSON.stringify(response)}`);
+		response.items.forEach(r => indexResource(r, resourceDir, db));
+	}
 }
 
 async function indexResource(resource: any, resourceDir: string, db: any) {
 	console.log(`index ${JSON.stringify(resource)}`);
 	if (resource.mime === 'application/pdf') {
 		const fs = joplin.plugins.require('fs-extra'); // TODO import once
-		// const pdf = require('pdf-parse');
-		// const buffer = fs.readFileSync(`${resourceDir}/${resource.id}.pdf`);
-		// const data = await pdf(buffer);
-		// console.log(`parsed pdf: ${JSON.stringify(data)}`);
 
 		const text = await extractText(`${resourceDir}/${resource.id}.pdf`);
 		console.log(`extracted text from ${resource.title}: ${text.substring(0, 100)}`);
