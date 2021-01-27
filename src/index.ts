@@ -1,5 +1,6 @@
 import joplin from 'api';
 import JoplinData from 'api/JoplinData';
+import { MenuItemLocation } from 'api/types';
 
 async function extractText(path: string): Promise<string> {
 	return new Promise((resolve, reject) => {
@@ -72,11 +73,8 @@ async function pdfToText(path, callbackAllDone) {
 }
 
 async function initDb(path: string) {
-	console.log('init db');
 	const sqlite3 = joplin.plugins.require('sqlite3');
-	console.log('imported module: ' + typeof sqlite3);
 	const db = new sqlite3.Database(`${path}/resource.sqlite`);
-	console.log('created db: ' + typeof db);
 	await db.run('CREATE VIRTUAL TABLE IF NOT EXISTS resources_fts USING fts5(id, title, text)');
 	return db;
 }
@@ -116,5 +114,30 @@ joplin.plugins.register({
 		const db = await initDb(profileDir);
 
 		await indexResources(joplin.data, resourceDir, db);
+
+		const searchDialogHandle = await joplin.views.dialogs.create('searchDialog');
+		await joplin.views.dialogs.setHtml(searchDialogHandle, `
+		<form name="form">
+			Query: <input name="query" type="text" required autofocus>
+		</form>
+		`);
+
+		await joplin.commands.register({
+			name: 'searchAttachments',
+			label: 'Search in attachments',
+			execute: async () => {
+				console.log('here be search');
+				const result = await joplin.views.dialogs.open(searchDialogHandle);
+				console.log(`and the query is ${JSON.stringify(result)}`);
+				if (result.id === 'ok') {
+					const query = result.formData.form.query;
+					console.log(`query ${query}`);
+					db.all('SELECT * FROM resources_fts WHERE text MATCH ?', query, (err, searchResult) => {
+						console.log(`result: ${JSON.stringify(searchResult)}`);
+					});
+				}
+			},
+		})
+		await joplin.views.menuItems.create('Search in attachments', 'searchAttachments', MenuItemLocation.Edit);
 	},
 });
