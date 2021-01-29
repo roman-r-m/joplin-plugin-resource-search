@@ -6,7 +6,7 @@
 	"name": "Resource Search Plugin",
 	"description": "Search in Resources",
 	"author": "Roman Musin",
-	"homepage_url": "",
-	"repository_url": "",
+	"homepage_url": "https://github.com/roman-r-m/joplin-plugin-resource-search",
+	"repository_url": "https://github.com/roman-r-m/joplin-plugin-resource-search",
 	"keywords": []
 }
