@@ -4,6 +4,7 @@ import { MenuItemLocation } from 'api/types';
 import { pdfToText} from '../index/pdf';
 import { addToIndex, initDb, query } from './database';
 import { Database } from 'sqlite3';
+import { Message, SearchResult, NoteRef } from '../common';
 
 async function indexResources(api: JoplinData, resourceDir: string, db: Database) {
 	let page = 0;
@@ -32,19 +33,17 @@ async function indexResource(resource: any, resourceDir: string, db: Database) {
 		addToIndex(db, resource.title, resource.id, text);
 	}
 }
-async function transformResult(searchResult: any[]) {
-	const res = [];
+async function transformResult(searchResult: any[]): Promise<SearchResult[]> {
+	const res: SearchResult[] = [];
 	console.log(`result: ${JSON.stringify(searchResult)}`);
 	for (let i = 0; i < searchResult.length; i++) {
 		const resource = searchResult[i];
 		// TODO collect promises and await all
-		const notes = (await joplin.data.get(['resources', resource.id, 'notes'], { fields: ['id', 'title']})).items;
-		const note = !!notes && notes.length > 0 ? notes[0] : {}; // TODO what if more than 1 note?
+		const notes: NoteRef[] = (await joplin.data.get(['resources', resource.id, 'notes'], { fields: ['id', 'title']})).items;
 		res.push({
 			id: resource.id,
 			title: resource.title,
-			noteTitle: note.title,
-			noteId: note.id
+			notes: notes,
 		});
 	}
 	return res;
@@ -66,19 +65,23 @@ joplin.plugins.register({
 
 		joplin.views.dialogs.setHtml(resourceSearch, `
 		<div id="resource-search" style="display: flex; flex-direction: column; min-width: 400px; resize: both;">
-			<input id="query-input" type="text" autofocus/><br/>
-			<div id="search-results"></div>
+			<input id="query-input" type="text">
+			<div id="search-results" style="overflow: hidden auto;"></div>
 		</div>
 		`);
 
-		joplin.views.panels.onMessage(resourceSearch, async msg => {
+		joplin.views.panels.onMessage(resourceSearch, async (msg: Message) => {
 			console.log(`on message: ${JSON.stringify(msg)}`);
-			if (msg.type === 'search') {
-				const result: any[] = await query(db, 'SELECT id,title FROM resources_fts WHERE text MATCH ?', msg.query);
-				console.log(`results: ${JSON.stringify(result)}`);
-				return await transformResult(result);
-			} else if (msg.type === 'goToNote') {
-				joplin.commands.execute('openNote', msg.noteId);
+			switch (msg.type) {
+				case 'search':
+					const result: any[] = await query(db, 'SELECT id,title FROM resources_fts WHERE text MATCH ?', msg.query);
+					console.log(`results: ${JSON.stringify(result)}`);
+					return await transformResult(result);
+				case 'goto':
+					// TODO scroll to resource
+					await joplin.views.panels.hide(resourceSearch);
+					await joplin.commands.execute('openNote', msg.noteId);
+					break;
 			}
 		});
 

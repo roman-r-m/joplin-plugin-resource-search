@@ -1,4 +1,6 @@
-function debounce(func, timeout = 300) {
+import { GotoMessage, SearchResult } from "src/common";
+
+function debounce(func: Function, timeout = 300) {
     let timer;
     return (...args) => {
         clearTimeout(timer);
@@ -9,7 +11,7 @@ function debounce(func, timeout = 300) {
 declare const webviewApi: any;
 
 const getResources = debounce(async query => {
-    const results = await webviewApi.postMessage({
+    const results: SearchResult[] = await webviewApi.postMessage({
         type: 'search',
         query: query
     });
@@ -27,6 +29,7 @@ const getResources = debounce(async query => {
             const searchResult = results[i];
             const row = document.createElement('div');
             row.setAttribute('class', 'search-result-row');
+            row.setAttribute('style', 'display: flex; flex-direction: row;');
             searchResults.appendChild(row);
 
             const resourceName = document.createElement('div');
@@ -36,11 +39,21 @@ const getResources = debounce(async query => {
 
             const includedIn = document.createElement('div');
             includedIn.setAttribute('class', 'referencing-notes-cell');
-            const noteLink = document.createElement('a');
-            noteLink.setAttribute('href', '#');
-            noteLink.innerText = searchResult.noteTitle;
-            includedIn.appendChild(noteLink);
+            includedIn.setAttribute('style', 'display: flex; flex-direction: column;');
             row.appendChild(includedIn);
+            searchResult.notes.forEach(n =>{
+                const noteLink = document.createElement('a');
+                noteLink.setAttribute('href', '#');
+                noteLink.addEventListener('click', ev => {
+                    webviewApi.postMessage({
+                        type: 'goto',
+                        resourceId: searchResult.id,
+                        noteId: n.id
+                    } as GotoMessage);
+                });
+                noteLink.innerText = n.title;
+                includedIn.appendChild(noteLink);
+            });
         }
     }
 });
