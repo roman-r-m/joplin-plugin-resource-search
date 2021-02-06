@@ -2,9 +2,9 @@ import { Database, sqlite3 } from 'sqlite3';
 
 const SCHEMA_VERSION = 1;
 
-function query(db: Database, query, ...params) {
+function query(db: Database, query, ...params): Promise<any[]> {
 	return new Promise((resolve, reject) => {
-		db.run(query, params, (err, rows) => {
+		db.all(query, params, (err, rows) => {
 			if (!!err) {
 				reject(err);
 			} else {
@@ -30,7 +30,8 @@ async function initDb(path: string, sqlite3: sqlite3): Promise<Database> {
 	const db: Database = new sqlite3.Database(`${path}/resources.sqlite`);
     await run(db, 'CREATE TABLE IF NOT EXISTS settings (name TEXT PRIMARY KEY, value TEXT)');
 	const version = await query(db, 'SELECT value FROM settings WHERE name = ?', 'version');
-	if (version !== SCHEMA_VERSION) {
+    const ver = !!version ? version[0] : -1;
+	if (ver !== SCHEMA_VERSION) {
         // rebuild index
         await run(db, 'DROP TABLE IF EXISTS resources_fts');
 		await run(db, 'CREATE VIRTUAL TABLE IF NOT EXISTS resources_fts USING fts5(id, title, text)');
