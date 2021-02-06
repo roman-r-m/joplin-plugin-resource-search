@@ -1,0 +1,32 @@
+#resource-search {
+    min-width: 400px;
+}
+
+#query-input {
+    width: 100%;
+}
+
+#search-results {
+    display: table;
+}
+
+#results-header {
+    display: table-header-group;
+}
+
+.results-row {
+    display: table-row;
+}
+
+#file-title,
+#referencing-notes {
+    text-align: center;
+    background-color: lightgray;
+}
+
+#file-title,
+#referencing-notes,
+.resource-name-cell,
+.referencing-notes-cell {
+    display: table-cell;
+    padding: 2px;

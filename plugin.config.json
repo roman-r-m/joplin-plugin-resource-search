@@ -1,6 +1,4 @@
 {
 	"extraScripts": [
-		"index/pdf.ts",
-		"database.ts"
 	]
 }

@@ -62,12 +62,12 @@ joplin.plugins.register({
 		const resourceSearch = await joplin.views.dialogs.create('resourceSearch');
 		joplin.views.dialogs.setButtons(resourceSearch, []);
 		joplin.views.dialogs.addScript(resourceSearch, './resource-search-view.js')
+		joplin.views.dialogs.addScript(resourceSearch, './resource-search-view.css')
 
 		joplin.views.dialogs.setHtml(resourceSearch, `
-		<div id="resource-search" style="display: block; min-width: 300px">
-			<input id="query-input" type="text" autofocus/>
-			<div id="search-results">
-			</div>
+		<div id="resource-search" style="display: flex; flex-direction: column; min-width: 400px; resize: both;">
+			<input id="query-input" type="text" autofocus/><br/>
+			<div id="search-results"></div>
 		</div>
 		`);
 
@@ -84,7 +84,7 @@ joplin.plugins.register({
 
 		await joplin.commands.register({
 			name: 'searchAttachments',
-			label: 'Search in attachments',
+			label: 'Search in Attachments',
 			execute: async () => {
 				joplin.views.dialogs.open(resourceSearch);
 			},

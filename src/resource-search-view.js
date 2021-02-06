@@ -1,4 +1,4 @@
-function debounce(func, timeout = 300){
+function debounce(func, timeout = 300) {
     let timer;
     return (...args) => {
         clearTimeout(timer);
@@ -6,21 +6,39 @@ function debounce(func, timeout = 300){
     };
 }
 const getResources = debounce(async query => {
-    if (query.length > 0) {
-        const results = await webviewApi.postMessage({
-            type: 'search',
-            query: query
-        });
-        const resultsRoot = document.getElementById('search-results');
+    const results = await webviewApi.postMessage({
+        type: 'search',
+        query: query
+    });
+
+    const searchResults = document.getElementById('search-results');
+    searchResults.innerText = '';
+
+    if (results.length > 0) {
+        searchResults.innerHTML = `
+            <div id="results-header">
+                <div id="file-title">Name</div><div id="referencing-notes">Included in</div>
+            </div>`;
+
         for (let i = 0; i < results.length; i++) {
-            const row = results[i];
-            const elem = document.createElement('div');
-            elem.setAttribute('style', 'width: 100%;');
-            elem.innerText = `${JSON.stringify(row)}`;
-            resultsRoot.appendChild(elem);
+            const searchResult = results[i];
+            const row = document.createElement('div');
+            row.setAttribute('class', 'search-result-row');
+            searchResults.appendChild(row);
+
+            const resourceName = document.createElement('div');
+            resourceName.setAttribute('class', 'resource-name-cell');
+            resourceName.innerText = searchResult.title;
+            row.appendChild(resourceName);
+
+            const includedIn = document.createElement('div');
+            includedIn.setAttribute('class', 'referencing-notes-cell');
+            const noteLink = document.createElement('a');
+            noteLink.setAttribute('href', '#');
+            noteLink.innerText = searchResult.noteTitle;
+            includedIn.appendChild(noteLink);
+            row.appendChild(includedIn);
         }
-    } else {
-        document.getElementById('search-results').textContent = '';
     }
 });
 
