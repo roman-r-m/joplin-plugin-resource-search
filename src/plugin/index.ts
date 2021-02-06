@@ -1,7 +1,7 @@
 import joplin from 'api';
 import JoplinData from 'api/JoplinData';
-import { MenuItemLocation, ViewHandle } from 'api/types';
-import { pdfToText} from './index/pdf';
+import { MenuItemLocation } from 'api/types';
+import { pdfToText} from '../index/pdf';
 import { addToIndex, initDb, query } from './database';
 import { Database } from 'sqlite3';
 
@@ -84,9 +84,9 @@ joplin.plugins.register({
 
 		await joplin.commands.register({
 			name: 'searchAttachments',
-			label: 'Search in Attachments',
+			label: 'Search in attachments',
 			execute: async () => {
-				joplin.views.dialogs.open(resourceSearch);
+				await joplin.views.dialogs.open(resourceSearch);
 			},
 		})
 		await joplin.views.menuItems.create('Search in attachments', 'searchAttachments', MenuItemLocation.Edit);

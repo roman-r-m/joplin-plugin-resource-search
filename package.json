@@ -2,7 +2,7 @@
   "name": "joplin-plugin-resource-search",
   "version": "1.0.0",
   "scripts": {
-    "dist": "webpack --joplin-plugin-config buildMain && webpack --joplin-plugin-config buildExtraScripts && webpack --joplin-plugin-config createArchive",
+    "dist": "webpack --joplin-plugin-config buildMain && webpack --joplin-plugin-config webview && webpack --joplin-plugin-config createArchive",
     "prepare": "npm run dist"
   },
   "license": "MIT",

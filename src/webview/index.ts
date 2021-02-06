@@ -5,6 +5,9 @@ function debounce(func, timeout = 300) {
         timer = setTimeout(() => { func.apply(this, args); }, timeout);
     };
 }
+
+declare const webviewApi: any;
+
 const getResources = debounce(async query => {
     const results = await webviewApi.postMessage({
         type: 'search',
@@ -42,7 +45,7 @@ const getResources = debounce(async query => {
     }
 });
 
-const queryInput = document.getElementById('query-input');
+const queryInput = document.getElementById('query-input') as HTMLInputElement;
 queryInput.addEventListener('input', e => {
     e.preventDefault();
     console.log(JSON.stringify(e));

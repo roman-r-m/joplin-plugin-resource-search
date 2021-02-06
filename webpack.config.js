@@ -134,7 +134,7 @@ const baseConfig = {
 };
 
 const pluginConfig = Object.assign({}, baseConfig, {
-	entry: './src/index.ts',
+	entry: './src/plugin/index.ts',
 	resolve: {
 		alias: {
 			api: path.resolve(__dirname, 'api'),
@@ -158,6 +158,7 @@ const pluginConfig = Object.assign({}, baseConfig, {
 							// already copied into /dist so we don't copy them.
 							'**/*.ts',
 							'**/*.tsx',
+							'**/webview/**',
 						],
 					},
 				},
@@ -227,6 +228,37 @@ function buildExtraScriptConfigs(userConfig) {
 	return output;
 }
 
+const webviewConfig = Object.assign({}, baseConfig, {
+	entry: './src/webview/index.ts',
+	target: 'web',
+	output: {
+		filename: 'resource-search-view.js',
+		path: distDir,
+	},
+	resolve: {
+		extensions: ['.tsx', '.ts', '.js'],
+	},
+	plugins: [
+		new CopyPlugin({
+			patterns: [
+				{
+					from: '**/*',
+					context: path.resolve(__dirname, 'src/webview'),
+					to: path.resolve(__dirname, 'dist'),
+					globOptions: {
+						ignore: [
+							// All TypeScript files are compiled to JS and
+							// already copied into /dist so we don't copy them.
+							'**/*.ts',
+							'**/*.tsx',
+						],
+					},
+				},
+			],
+		}),
+	]
+});
+
 function main(processArgv) {
 	const yargs = require('yargs/yargs');
 	const argv = yargs(processArgv).argv;
@@ -256,6 +288,8 @@ function main(processArgv) {
 		// exist and output in the publish dir. Then the plugin will delete this
 		// temporary file before packaging the plugin.
 		createArchive: [createArchiveConfig],
+
+		webview: [webviewConfig],
 	};
 
 	// If we are running the first config step, we clean up and create the build
