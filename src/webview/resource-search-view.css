@@ -36,3 +36,8 @@
     text-align: end;
     display: table-cell;
 }
+
+.referencing-notes-list {
+    display: flex;
+    flex-direction: column;
+}
