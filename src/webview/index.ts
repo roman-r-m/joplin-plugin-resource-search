@@ -1,5 +1,7 @@
 import { GotoMessage, SearchResult } from "src/common";
 
+declare const webviewApi: any;
+
 function debounce(func: Function, timeout = 300) {
     let timer;
     return (...args) => {
@@ -7,90 +9,106 @@ function debounce(func: Function, timeout = 300) {
         timer = setTimeout(() => { func.apply(this, args); }, timeout);
     };
 }
+class SearchDialog {
 
-declare const webviewApi: any;
-let selectedIndex = -1;
+    root: Element;
+    results: SearchResult[];
+    selectedIndex: number = -1;
+    search: Function;
 
+    constructor() {
+        this.search = debounce(this.getResources);
+        const queryInput = document.getElementById('query-input') as HTMLInputElement;
+        queryInput.addEventListener('input', e => {
+            e.preventDefault();
+            this.getResources(queryInput.value);
+        });
 
-const getResources = debounce(async query => {
-    const results: SearchResult[] = await webviewApi.postMessage({
-        type: 'search',
-        query: query
-    });
-
-    const searchResults = document.getElementById('search-results');
-    searchResults.innerText = '';
-
-    if (results.length > 0) {
-        selectedIndex = -1;
-        for (let i = 0; i < results.length; i++) {
-            const searchResult = results[i];
-            const row = document.createElement('div');
-            row.setAttribute('class', 'search-result-row');
-            searchResults.appendChild(row);
-
-            const resourceName = document.createElement('div');
-            resourceName.setAttribute('class', 'resource-name-cell');
-            resourceName.innerText = searchResult.title;
-            row.appendChild(resourceName);
-
-            const includedIn = document.createElement('div');
-            includedIn.setAttribute('class', 'referencing-notes-cell');
-            row.appendChild(includedIn);
-
-            const referencingNotesList = document.createElement('div');
-            referencingNotesList.setAttribute('class', 'referencing-notes-list')
-            includedIn.appendChild(referencingNotesList);
-
-            searchResult.notes.forEach(n =>{
-                const noteLink = document.createElement('a');
-                noteLink.setAttribute('href', '#');
-                noteLink.addEventListener('click', ev => {
-                    webviewApi.postMessage({
-                        type: 'goto',
-                        resourceId: searchResult.id,
-                        noteId: n.id
-                    } as GotoMessage);
-                });
-                noteLink.innerText = n.title;
-                referencingNotesList.appendChild(noteLink);
-            });
-        }
+        const root = document.getElementById('joplin-plugin-content');
+        root.addEventListener('keydown', evt => this.onKey(evt));
     }
-});
 
-const queryInput = document.getElementById('query-input') as HTMLInputElement;
-queryInput.addEventListener('input', e => {
-    e.preventDefault();
-    console.log(JSON.stringify(e));
-    getResources(queryInput.value);
-});
-
-const root = document.getElementById('joplin-plugin-content');
-const results = document.getElementById('search-results');
-// document.addEventListener('click', e => {
-//     if (!root.contains(e.target)) {
-//         close the dialog
-//     }
-// });
-
-
-root.addEventListener('keydown', evt => {
-    switch (evt.key) {
-        case 'Up':
-        case 'Down':
-        case 'ArrowUp':
-        case 'ArrowDown': {
-          const newIndex = evt.key === 'ArrowUp' || evt.key === 'Up' ? selectedIndex - 1 : selectedIndex + 1;
-          if (results.children.length > 0) {
-            if (selectedIndex > 0) {
-                results.children[selectedIndex].removeAttribute('selected');
+    onKey(event: KeyboardEvent): any {
+        const key = event.key;
+        switch (key) {
+            case 'Up':
+            case 'Down':
+            case 'ArrowUp':
+            case 'ArrowDown': {
+                const results = document.getElementById('search-results');
+                const newIndex = key === 'ArrowUp' || key === 'Up' ? this.selectedIndex - 1 : this.selectedIndex + 1;
+                const max = results.children.length;
+                if (max > 0) {
+                    if (this.selectedIndex >= 0) {
+                        results.children[this.selectedIndex].removeAttribute('selected');
+                    }
+                    this.selectedIndex = newIndex < 0 ? max - 1 : (newIndex % results.children.length);
+                    results.children[this.selectedIndex].setAttribute('selected', 'true');
+                }
+                event.preventDefault();
+                break;
             }
-            selectedIndex = (newIndex % results.children.length);
-            results.children[selectedIndex].setAttribute('selected', 'true');
-          }
-          evt.preventDefault();
-          break;
+            case 'Enter':
+                this.select(this.selectedIndex);
+                break;
         }
     }
-});
+
+    async getResources(query: string) {
+        this.results = await webviewApi.postMessage({
+            type: 'search',
+            query: query
+        });
+
+        // TODO compare new with existing and only redraw on change?
+        this.redraw();
+    }
+
+    select(index: number) {
+        if (index >= 0 && index < this.results.length) {
+            const result = this.results[index];
+            webviewApi.postMessage({
+                type: 'goto',
+                resourceId: result.id,
+                noteId: result.notes[0].id //TODO
+            } as GotoMessage);
+        }
+    }
+    redraw() {
+        const searchResults = document.getElementById('search-results');
+        searchResults.innerText = '';
+
+        if (this.results.length > 0) {
+            this.selectedIndex = -1;
+            for (let i = 0; i < this.results.length; i++) {
+                const searchResult = this.results[i];
+                const row = document.createElement('div');
+                row.setAttribute('class', 'search-result-row');
+                searchResults.appendChild(row);
+
+                const resourceName = document.createElement('div');
+                resourceName.setAttribute('class', 'resource-name-cell');
+                resourceName.innerText = searchResult.title;
+                row.appendChild(resourceName);
+
+                const includedIn = document.createElement('div');
+                includedIn.setAttribute('class', 'referencing-notes-cell');
+                row.appendChild(includedIn);
+
+                const referencingNotesList = document.createElement('div');
+                referencingNotesList.setAttribute('class', 'referencing-notes-list')
+                includedIn.appendChild(referencingNotesList);
+
+                searchResult.notes.forEach(n => {
+                    const noteLink = document.createElement('a');
+                    noteLink.setAttribute('href', '#');
+                    noteLink.addEventListener('click', _e => this.select(i));
+                    noteLink.innerText = `In: ${n.title}`;
+                    referencingNotesList.appendChild(noteLink);
+                });
+            }
+        }
+    }
+}
+
+new SearchDialog();
