@@ -82,7 +82,7 @@ class SearchDialog {
             this.selectedIndex = -1;
             for (let i = 0; i < this.results.length; i++) {
                 const searchResult = this.results[i];
-                const row = document.createElement('div');
+                const row = document.createElement('li');
                 row.setAttribute('class', 'search-result-row');
                 searchResults.appendChild(row);
 

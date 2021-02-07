@@ -64,8 +64,8 @@ joplin.plugins.register({
 
 		joplin.views.dialogs.setHtml(resourceSearch, `
 		<div id="resource-search">
-			<input id="query-input" type="text">
-			<div id="search-results"></div>
+			<input id="query-input" type="text" autofocus>
+			<ul id="search-results"></ul>
 		</div>
 		`);
 
@@ -77,7 +77,7 @@ joplin.plugins.register({
 					console.log(`results: ${JSON.stringify(result)}`);
 					return await transformResult(result);
 				case 'goto':
-					// TODO scroll to resource
+					// TODO scroll to the resource position within the note
 					await joplin.views.panels.hide(resourceSearch);
 					await joplin.commands.execute('openNote', msg.noteId);
 					break;
