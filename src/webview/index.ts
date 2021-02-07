@@ -9,6 +9,8 @@ function debounce(func: Function, timeout = 300) {
 }
 
 declare const webviewApi: any;
+let selectedIndex = -1;
+
 
 const getResources = debounce(async query => {
     const results: SearchResult[] = await webviewApi.postMessage({
@@ -20,6 +22,7 @@ const getResources = debounce(async query => {
     searchResults.innerText = '';
 
     if (results.length > 0) {
+        selectedIndex = -1;
         for (let i = 0; i < results.length; i++) {
             const searchResult = results[i];
             const row = document.createElement('div');
@@ -61,4 +64,33 @@ queryInput.addEventListener('input', e => {
     e.preventDefault();
     console.log(JSON.stringify(e));
     getResources(queryInput.value);
+});
+
+const root = document.getElementById('joplin-plugin-content');
+const results = document.getElementById('search-results');
+// document.addEventListener('click', e => {
+//     if (!root.contains(e.target)) {
+//         close the dialog
+//     }
+// });
+
+
+root.addEventListener('keydown', evt => {
+    switch (evt.key) {
+        case 'Up':
+        case 'Down':
+        case 'ArrowUp':
+        case 'ArrowDown': {
+          const newIndex = evt.key === 'ArrowUp' || evt.key === 'Up' ? selectedIndex - 1 : selectedIndex + 1;
+          if (results.children.length > 0) {
+            if (selectedIndex > 0) {
+                results.children[selectedIndex].removeAttribute('selected');
+            }
+            selectedIndex = (newIndex % results.children.length);
+            results.children[selectedIndex].setAttribute('selected', 'true');
+          }
+          evt.preventDefault();
+          break;
+        }
+    }
 });
