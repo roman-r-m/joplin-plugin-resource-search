@@ -20,16 +20,15 @@ const getResources = debounce(async query => {
     searchResults.innerText = '';
 
     if (results.length > 0) {
-        searchResults.innerHTML = `
-            <div id="results-header">
-                <div id="file-title">Name</div><div id="referencing-notes">Included in</div>
-            </div>`;
+        // searchResults.innerHTML = `
+        //     <div id="results-header">
+        //         <div id="file-title">Name</div><div id="referencing-notes">Included in</div>
+        //     </div>`;
 
         for (let i = 0; i < results.length; i++) {
             const searchResult = results[i];
             const row = document.createElement('div');
             row.setAttribute('class', 'search-result-row');
-            row.setAttribute('style', 'display: flex; flex-direction: row;');
             searchResults.appendChild(row);
 
             const resourceName = document.createElement('div');
@@ -39,7 +38,6 @@ const getResources = debounce(async query => {
 
             const includedIn = document.createElement('div');
             includedIn.setAttribute('class', 'referencing-notes-cell');
-            includedIn.setAttribute('style', 'display: flex; flex-direction: column;');
             row.appendChild(includedIn);
             searchResult.notes.forEach(n =>{
                 const noteLink = document.createElement('a');

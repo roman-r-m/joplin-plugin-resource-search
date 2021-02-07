@@ -51,7 +51,6 @@ async function transformResult(searchResult: any[]): Promise<SearchResult[]> {
 
 joplin.plugins.register({
 	onStart: async function() {
-		try {
 		const dbPath = await joplin.plugins.dataDir();
 		const db = await initDb(dbPath, joplin.plugins.require('sqlite3'));
 
@@ -64,9 +63,9 @@ joplin.plugins.register({
 		joplin.views.dialogs.addScript(resourceSearch, './resource-search-view.css')
 
 		joplin.views.dialogs.setHtml(resourceSearch, `
-		<div id="resource-search" style="display: flex; flex-direction: column; min-width: 400px; resize: both;">
+		<div id="resource-search">
 			<input id="query-input" type="text">
-			<div id="search-results" style="overflow: hidden auto;"></div>
+			<div id="search-results"></div>
 		</div>
 		`);
 
@@ -93,6 +92,5 @@ joplin.plugins.register({
 			},
 		})
 		await joplin.views.menuItems.create('Search in attachments', 'searchAttachments', MenuItemLocation.Edit);
-	} catch (e) { console.error(e)}
 	},
 });

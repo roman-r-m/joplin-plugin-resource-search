@@ -1,36 +1,38 @@
 #joplin-plugin-content {
-    min-width: 400px;
+    width: fit-content;
 }
 
 #resource-search {
+    width: fit-content;
+    display: block;
+    flex-direction: column;
     min-width: 400px;
 }
 
 #query-input {
     width: 100%;
+    box-sizing: border-box;
 }
 
 #search-results {
     display: table;
+    width: 100%;
 }
 
 #results-header {
     display: table-header-group;
 }
 
-.results-row {
-    display: table-row;
+.search-result-row {
+    display: table-row-group;
 }
 
-#file-title,
-#referencing-notes {
-    text-align: center;
-    background-color: lightgray;
-}
-
-#file-title,
-#referencing-notes,
-.resource-name-cell,
-.referencing-notes-cell {
+.resource-name-cell {
+    text-align: start;
     display: table-cell;
-    padding: 2px;
+}
+
+.referencing-notes-cell {
+    text-align: end;
+    display: table-cell;
+}
