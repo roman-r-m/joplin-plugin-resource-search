@@ -86,6 +86,8 @@ class SearchDialog {
                 row.setAttribute('class', 'search-result-row');
                 searchResults.appendChild(row);
 
+                row.addEventListener('click', _e => this.select(i));
+
                 const resourceName = document.createElement('div');
                 resourceName.setAttribute('class', 'resource-name-cell');
                 resourceName.innerText = searchResult.title;
@@ -100,9 +102,7 @@ class SearchDialog {
                 includedIn.appendChild(referencingNotesList);
 
                 searchResult.notes.forEach(n => {
-                    const noteLink = document.createElement('a');
-                    noteLink.setAttribute('href', '#');
-                    noteLink.addEventListener('click', _e => this.select(i));
+                    const noteLink = document.createElement('div');
                     noteLink.innerText = `In: ${n.title}`;
                     referencingNotesList.appendChild(noteLink);
                 });

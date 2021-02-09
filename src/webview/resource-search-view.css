@@ -2,8 +2,6 @@
     width: fit-content;
 	background-color: var(--joplin-background-color);
 	color: var(--joplin-color);
-	font-size: var(--joplin-font-size);
-	font-family: var(--joplin-font-family);
 }
 
 #resource-search {
@@ -19,6 +17,8 @@
     width: 100%;
     box-sizing: border-box;
     border-radius: 8px;
+    font-size: var(--joplin-font-size);
+	font-family: var(--joplin-font-family);
 }
 
 #search-results {
@@ -52,21 +52,31 @@
     display: table-row-group;
     padding: 12px 12px 12px 48px;
     border: 1px solid rgba(0, 0, 0, 0.12);
+    margin: 10px 0;
 }
 
-.search-result-row:hover,
+.search-result-row:hover {
+    background-color: rgba(0, 0, 0, 0.06);
+}
+
 .search-result-row[selected="true"] {
-  background-color: rgba(0, 0, 0, 0.06);
+  background-color: rgba(0, 0, 0, 0.144);
 }
 
 .resource-name-cell {
+    cursor: pointer;
     text-align: start;
     display: table-cell;
+    font-size: var(--joplin-font-size);
+	font-family: var(--joplin-font-family);
 }
 
 .referencing-notes-cell {
+    cursor: pointer;
     text-align: end;
     display: table-cell;
+    font-size: var(--joplin-font-size);
+	font-family: var(--joplin-font-family);
 }
 
 .referencing-notes-list {
