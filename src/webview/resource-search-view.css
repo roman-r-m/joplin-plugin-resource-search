@@ -16,9 +16,8 @@
 #query-input {
     width: 100%;
     box-sizing: border-box;
-    border-radius: 8px;
     font-size: var(--joplin-font-size);
-	font-family: var(--joplin-font-family);
+    font-family: var(--joplin-font-family);
 }
 
 #search-results {

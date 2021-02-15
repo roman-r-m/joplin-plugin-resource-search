@@ -14,7 +14,7 @@ type Message = SearchMessage | GotoMessage;
 type SearchResult = {
     id: string,
     title: string,
-    notes: NoteRef[]
+    note: NoteRef
 };
 
 type NoteRef = {

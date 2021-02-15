@@ -3,8 +3,8 @@ import { GotoMessage, SearchResult } from "src/common";
 declare const webviewApi: any;
 
 function debounce(func: Function, timeout = 300) {
-    let timer;
-    return (...args) => {
+    let timer: any;
+    return (...args: any[]) => {
         clearTimeout(timer);
         timer = setTimeout(() => { func.apply(this, args); }, timeout);
     };
@@ -70,7 +70,7 @@ class SearchDialog {
             webviewApi.postMessage({
                 type: 'goto',
                 resourceId: result.id,
-                noteId: result.notes[0].id //TODO
+                noteId: result.note.id
             } as GotoMessage);
         }
     }
@@ -95,17 +95,8 @@ class SearchDialog {
 
                 const includedIn = document.createElement('div');
                 includedIn.setAttribute('class', 'referencing-notes-cell');
+                includedIn.innerText = `In: ${searchResult.note.title}`;
                 row.appendChild(includedIn);
-
-                const referencingNotesList = document.createElement('div');
-                referencingNotesList.setAttribute('class', 'referencing-notes-list')
-                includedIn.appendChild(referencingNotesList);
-
-                searchResult.notes.forEach(n => {
-                    const noteLink = document.createElement('div');
-                    noteLink.innerText = `In: ${n.title}`;
-                    referencingNotesList.appendChild(noteLink);
-                });
             }
         }
     }
