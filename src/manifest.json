@@ -2,7 +2,7 @@
 	"manifest_version": 1,
 	"id": "net.rmusin.resource-search",
 	"app_min_version": "1.7",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"name": "Resource Search Plugin",
 	"description": "Search in Attached Resources",
 	"author": "Roman Musin",
