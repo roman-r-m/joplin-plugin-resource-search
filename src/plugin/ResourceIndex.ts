@@ -28,7 +28,7 @@ class ResourceIndex {
         // init the database
         await run(db, 'CREATE TABLE IF NOT EXISTS settings (name TEXT PRIMARY KEY, value TEXT)');
         const versionResult = await query(db, 'SELECT value FROM settings WHERE name = ?', 'version');
-        const version = !!versionResult ? Number(versionResult[0].value) : -1;
+        const version = !!versionResult && versionResult.length > 0 ? Number(versionResult[0].value) : -1;
         console.log(`plugin schema version: ${SCHEMA_VERSION}, db schema version: ${version}`);
 
         if (version !== SCHEMA_VERSION) {
