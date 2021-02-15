@@ -1,10 +1,10 @@
 {
 	"manifest_version": 1,
-	"id": "com.whatever.resource-search",
+	"id": "net.rmusin.resource-search",
 	"app_min_version": "1.7",
-	"version": "1.0.0",
+	"version": "0.1.0",
 	"name": "Resource Search Plugin",
-	"description": "Search in Resources",
+	"description": "Search in Attached Resources",
 	"author": "Roman Musin",
 	"homepage_url": "https://github.com/roman-r-m/joplin-plugin-resource-search",
 	"repository_url": "https://github.com/roman-r-m/joplin-plugin-resource-search",
