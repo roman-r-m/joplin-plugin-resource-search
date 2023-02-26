@@ -1,5 +1,6 @@
-import * as pdfjs  from 'pdfjs-dist/es5/build/pdf.js';
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
+import * as pdfjs  from 'pdfjs-dist/legacy/build/pdf.js';
+import pdfjsWorker from 'pdfjs-dist/legacy/build/pdf.worker.entry';
+import { TextItem } from 'pdfjs-dist/types/src/display/api';
 
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
@@ -16,7 +17,7 @@ async function pdfToText(path) {
 			let page_text = "";
 			let last_item = null;
 			for (let itemsi = 0; itemsi < textContent.items.length; itemsi++) {
-				let item = textContent.items[itemsi];
+				let item = textContent.items[itemsi] as TextItem;
 				if (last_item != null && last_item.str[last_item.str.length - 1] != ' ') {
 					let itemX = item.transform[5]
 					let lastItemX = last_item.transform[5]

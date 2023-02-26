@@ -1,6 +1,6 @@
 {
   "name": "joplin-plugin-resource-search",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "scripts": {
     "dist": "webpack --joplin-plugin-config buildMain && webpack --joplin-plugin-config webview && webpack --joplin-plugin-config createArchive",
     "prepare": "npm run dist"
@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "pdf-parse": "^1.1.1",
+    "pdfjs": "^2.4.7",
     "pdfjs-dist": "^2.6.347"
   }
 }
